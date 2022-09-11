@@ -2,13 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gdoc/colors.dart';
 import 'package:gdoc/repository/auth_repository.dart';
+import 'package:gdoc/screens/home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
-  void signInWithGoogle(WidgetRef ref) {
-    ref.read(authRepositoryProvider).signInWithGoogle();
+  void signInWithGoogle(BuildContext context, WidgetRef ref) async {
+    final sMessenger = ScaffoldMessenger.of(
+        context); // Build context should not be used across async gaps.
+    final navigator = Navigator.of(context);
+    final errorModel =
+        await ref.read(authRepositoryProvider).signInWithGoogle();
+    if (errorModel.error == null) {
+      ref.read(userProvider.notifier).update((state) => errorModel.data);
+      navigator.push(
+        MaterialPageRoute(
+          builder: (context) => const HomeScreen(),
+        ),
+      );
+    } else {
+      sMessenger.showSnackBar(
+        SnackBar(
+          content: Text(errorModel.error!),
+        ),
+      );
+    }
   }
 
   @override
@@ -37,7 +56,7 @@ class LoginScreen extends ConsumerWidget {
               child: Center(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    signInWithGoogle(ref);
+                    signInWithGoogle(context, ref);
                   },
                   icon: Image.asset(
                     "assets/g-logo.png",

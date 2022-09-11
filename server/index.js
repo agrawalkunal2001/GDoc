@@ -4,6 +4,7 @@
 // npm i nodemon --save-dev
 const express = require("express"); // import express
 const mongoose = require("mongoose"); // import mongoose
+const cors = require("cors"); // import cors
 const authRouter = require("./routes/auth");
 
 const PORT = process.env.PORT | 3001;
@@ -12,6 +13,7 @@ const app = express(); // initialise express
 const DB = "mongodb+srv://agrawalkunal2001:Kunal2001$@cluster0.xfdbjom.mongodb.net/?retryWrites=true&w=majority";
 
 // middleware
+app.use(cors());
 app.use(express.json());
 app.use(authRouter);
 
